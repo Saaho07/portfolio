@@ -1,137 +1,314 @@
+/* ══════════════════════════════════════════════════════════════════════
+   LANDING — Cinematic deep-ocean dusk atmosphere
+   ══════════════════════════════════════════════════════════════════════ */
+
 .landing {
   position: absolute;
   inset: 0;
   cursor: pointer;
   overflow: hidden;
   z-index: 10;
+  animation: pageBreath 12s ease-in-out infinite;
+}
+@keyframes pageBreath {
+  0%,100% { filter: brightness(1.00); }
+  50%      { filter: brightness(1.04); }
 }
 
-/* Sky gradient — dark starry sky to horizon blue */
+/* ── Sky ─────────────────────────────────────────────────────────────── */
 .sky {
   position: absolute;
   inset: 0;
   background: linear-gradient(
     to bottom,
-    #000508 0%,
-    #010c18 30%,
-    #021828 55%,
-    #03304e 72%,
-    #0a4a6e 84%,
-    #0d5a7a 92%,
-    #12899e 100%
+    #000407 0%,
+    #000d1a 22%,
+    #011826 42%,
+    #022a42 60%,
+    #073d60 74%,
+    #0a4f74 84%,
+    #0d6080 93%,
+    #128090 100%
   );
   z-index: 0;
 }
 
+/* ── Star canvas ─────────────────────────────────────────────────────── */
 .stars {
   position: absolute;
   inset: 0;
   z-index: 1;
   pointer-events: none;
+  transition: opacity 0.8s ease;
+}
+.starsFade { opacity: 0; }
+
+/* ── Haze bands ──────────────────────────────────────────────────────── */
+.hazeBand {
+  position: absolute;
+  left: 0; right: 0;
+  top: var(--hy);
+  height: 1px;
+  background: linear-gradient(
+    90deg,
+    transparent 0%,
+    rgba(56,190,248,var(--hopacity)) 20%,
+    rgba(168,230,239,calc(var(--hopacity) * 1.6)) 50%,
+    rgba(56,190,248,var(--hopacity)) 80%,
+    transparent 100%
+  );
+  z-index: 2;
+  pointer-events: none;
 }
 
-/* Sun glow */
+/* ── Sun system ──────────────────────────────────────────────────────── */
 .sunHalo {
   position: absolute;
-  top: 21%;
+  top: 23%;
   left: 50%;
   transform: translate(-50%, -50%);
-  width: 320px;
-  height: 180px;
-  background: radial-gradient(ellipse, rgba(200,160,60,0.18) 0%, transparent 70%);
+  width: 500px;
+  height: 280px;
+  background: radial-gradient(
+    ellipse at center,
+    rgba(244,196,48,0.20) 0%,
+    rgba(220,150,30,0.10) 30%,
+    rgba(200,120,20,0.04) 55%,
+    transparent 70%
+  );
   z-index: 2;
-  animation: haloBreath 4s ease-in-out infinite;
+  pointer-events: none;
+  will-change: transform;
+  animation: haloBreath 6s ease-in-out infinite;
 }
 @keyframes haloBreath {
-  0%,100% { opacity: 0.7; transform: translate(-50%,-50%) scale(1); }
-  50%      { opacity: 1;   transform: translate(-50%,-50%) scale(1.12); }
+  0%,100% { opacity: 0.75; }
+  50%      { opacity: 1.0; }
 }
 
 .sun {
   position: absolute;
-  top: 22%;
+  top: 23%;
   left: 50%;
   transform: translate(-50%, -50%);
-  width: 72px;
-  height: 72px;
-  border-radius: 50%;
-  background: radial-gradient(circle at 40% 38%, #fff8e0 0%, #f4c430 38%, #c9860a 80%);
-  box-shadow:
-    0 0 0 12px rgba(244,196,48,0.06),
-    0 0 40px 12px rgba(244,196,48,0.22),
-    0 0 100px 40px rgba(244,196,48,0.08);
+  width: 70px;
+  height: 70px;
   z-index: 3;
-  animation: sunPulse 4s ease-in-out infinite;
+  pointer-events: none;
+  will-change: transform;
+}
+.sunCore {
+  position: absolute;
+  inset: 0;
+  border-radius: 50%;
+  background: radial-gradient(circle at 38% 36%, #fffae0 0%, #f6d060 30%, #e0920a 75%, #b06010 100%);
+  box-shadow:
+    0 0 0 3px  rgba(244,196,48,0.10),
+    0 0 30px 8px  rgba(244,196,48,0.30),
+    0 0 80px 30px rgba(244,196,48,0.12),
+    0 0 200px 80px rgba(244,196,48,0.05);
+  animation: sunPulse 5s ease-in-out infinite;
 }
 @keyframes sunPulse {
-  0%,100% { transform: translate(-50%,-50%) scale(1); }
-  50%      { transform: translate(-50%,-50%) scale(1.05); }
+  0%,100% { transform: scale(1.00); }
+  50%      { transform: scale(1.06); }
+}
+.sunCorona {
+  position: absolute;
+  inset: -18px;
+  border-radius: 50%;
+  border: 1px solid rgba(244,196,48,0.13);
+  animation: coronaSpin 30s linear infinite;
+}
+@keyframes coronaSpin {
+  from { transform: rotate(0deg);   }
+  to   { transform: rotate(360deg); }
 }
 
-/* Hero text */
+/* ── Light rays ──────────────────────────────────────────────────────── */
+.sunRays {
+  position: absolute;
+  top: 0; left: 0; right: 0;
+  height: 65%;
+  z-index: 2;
+  pointer-events: none;
+  background: repeating-conic-gradient(
+    from 80deg at 50% 23%,
+    rgba(244,196,48,0.028) 0deg,
+    transparent 4deg,
+    transparent 12deg,
+    rgba(244,196,48,0.018) 13deg,
+    transparent 15deg
+  );
+  animation: raysDrift 18s ease-in-out infinite alternate;
+  mask-image: linear-gradient(to bottom, transparent 0%, rgba(0,0,0,0.6) 20%, rgba(0,0,0,0.6) 70%, transparent 100%);
+  -webkit-mask-image: linear-gradient(to bottom, transparent 0%, rgba(0,0,0,0.6) 20%, rgba(0,0,0,0.6) 70%, transparent 100%);
+}
+@keyframes raysDrift {
+  from { transform: rotate(-2deg) scale(1.02); opacity: 0.7; }
+  to   { transform: rotate( 2deg) scale(1.00); opacity: 1.0; }
+}
+
+/* ── Hero content ────────────────────────────────────────────────────── */
 .content {
   position: absolute;
-  top: 26%;
+  top: 50%;
   left: 50%;
-  transform: translateX(-50%);
+  transform: translate(-50%, -64%);
   text-align: center;
-  z-index: 4;
+  z-index: 5;
   pointer-events: none;
+  will-change: transform;
 }
 
+/* ── Eyebrow ─────────────────────────────────────────────────────────── */
 .eyebrow {
+  display: flex;
+  justify-content: center;
+  gap: 0;
   font-family: var(--mono);
-  font-size: 10px;
-  letter-spacing: 0.42em;
+  font-size: 9.5px;
+  letter-spacing: 0.52em;
   text-transform: uppercase;
-  color: rgba(200,200,220,0.5);
-  margin-bottom: 20px;
-  animation: fadeUp 1.2s 0.2s both;
+  color: rgba(200,210,230,0.42);
+  margin-bottom: 28px;
 }
 
+.eyebrowChar {
+  display: inline-block;
+  opacity: 0;
+  transform: translateY(10px);
+  transition:
+    opacity   0.5s ease calc(var(--ci) * 0.045s + 0.1s),
+    transform 0.5s ease calc(var(--ci) * 0.045s + 0.1s);
+}
+.contentVisible .eyebrowChar {
+  opacity: 1;
+  transform: translateY(0);
+}
+
+/* ── Name ────────────────────────────────────────────────────────────── */
 .name {
+  display: block;
   font-family: var(--serif);
   font-weight: 300;
-  font-size: clamp(3.5rem, 7vw, 6.5rem);
-  line-height: 0.92;
-  letter-spacing: -0.01em;
-  color: #dff2fc;
-  text-shadow: 0 2px 40px rgba(20,140,200,0.3);
-  animation: fadeUp 1.2s 0.4s both;
-}
-.name em {
-  font-style: italic;
-  color: var(--gold);
-  text-shadow: 0 2px 40px rgba(200,160,60,0.4);
+  margin: 0;
+  padding: 0;
 }
 
+.nameLine {
+  display: block;
+  font-size: clamp(4.5rem, 9vw, 8.5rem);
+  line-height: 0.86;
+  letter-spacing: -0.03em;
+  color: #e8f4fc;
+  text-shadow:
+    0 0 100px rgba(14,120,180,0.22),
+    0 1px 0 rgba(255,255,255,0.05);
+  opacity: 0;
+  transform: translateY(32px) scaleY(0.90);
+  transition:
+    opacity   0.9s cubic-bezier(0.16, 1, 0.3, 1) calc(var(--li) * 0.15s + 0.4s),
+    transform 0.9s cubic-bezier(0.16, 1, 0.3, 1) calc(var(--li) * 0.15s + 0.4s);
+}
+.contentVisible .nameLine {
+  opacity: 1;
+  transform: translateY(0) scaleY(1);
+}
+
+.nameLineEm em {
+  font-style: italic;
+  font-weight: 300;
+  color: transparent;
+  background: linear-gradient(
+    105deg,
+    #c9a84c 0%,
+    #e8d080 28%,
+    #f5e89a 50%,
+    #e8d080 72%,
+    #c9a84c 100%
+  );
+  background-size: 200% 100%;
+  -webkit-background-clip: text;
+  background-clip: text;
+  animation: goldShimmer 4s ease-in-out infinite;
+  text-shadow: none;
+}
+@keyframes goldShimmer {
+  0%   { background-position: 100% 0; }
+  50%  { background-position:   0% 0; }
+  100% { background-position: 100% 0; }
+}
+
+/* ── Sub row ─────────────────────────────────────────────────────────── */
+.subRow {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 14px;
+  margin-top: 30px;
+  opacity: 0;
+  transform: translateY(16px);
+  transition:
+    opacity   0.7s ease calc(var(--li) * 0.15s + 0.4s),
+    transform 0.7s ease calc(var(--li) * 0.15s + 0.4s);
+}
+.contentVisible .subRow {
+  opacity: 1;
+  transform: translateY(0);
+}
+.subDash {
+  display: block;
+  width: 28px;
+  height: 1px;
+  background: rgba(168,220,240,0.22);
+  flex-shrink: 0;
+}
 .sub {
   font-family: var(--mono);
-  font-size: 11px;
-  letter-spacing: 0.28em;
+  font-size: 9px;
+  letter-spacing: 0.38em;
   text-transform: uppercase;
-  color: rgba(168,220,240,0.55);
-  margin-top: 22px;
-  animation: fadeUp 1.2s 0.6s both;
+  color: rgba(168,220,240,0.44);
+  white-space: nowrap;
 }
 
-@keyframes fadeUp {
-  from { opacity: 0; transform: translateY(18px); }
-  to   { opacity: 1; transform: translateY(0); }
-}
-
-/* Horizon shimmer line */
+/* ── Horizon line ────────────────────────────────────────────────────── */
 .horizon {
   position: absolute;
   bottom: 43%;
   left: 0; right: 0;
   height: 1px;
-  background: linear-gradient(90deg, transparent 5%, rgba(94,207,223,0.35) 30%, rgba(168,230,239,0.55) 50%, rgba(94,207,223,0.35) 70%, transparent 95%);
-  z-index: 5;
-  box-shadow: 0 0 20px rgba(94,207,223,0.3);
+  z-index: 6;
+  background: linear-gradient(
+    90deg,
+    transparent 0%,
+    rgba(94,207,223,0.18) 12%,
+    rgba(200,240,248,0.55) 40%,
+    rgba(255,255,255,0.72) 50%,
+    rgba(200,240,248,0.55) 60%,
+    rgba(94,207,223,0.18) 88%,
+    transparent 100%
+  );
+  box-shadow:
+    0 0 8px  rgba(94,207,223,0.28),
+    0 0 28px rgba(94,207,223,0.10);
+  animation: horizonPulse 4s ease-in-out infinite alternate;
+}
+@keyframes horizonPulse {
+  from { opacity: 0.68; }
+  to   { opacity: 1.00; }
 }
 
-/* Water surface */
+/* ── Ripple canvas ───────────────────────────────────────────────────── */
+.rippleCanvas {
+  position: absolute;
+  inset: 0;
+  z-index: 7;
+  pointer-events: none;
+}
+
+/* ── Water surface waves ─────────────────────────────────────────────── */
 .surface {
   position: absolute;
   bottom: 0;
@@ -139,10 +316,9 @@
   right: 0;
   width: 200%;
   height: 44%;
-  z-index: 6;
+  z-index: 8;
   overflow: hidden;
 }
-
 .wave {
   position: absolute;
   left: 0;
@@ -154,56 +330,91 @@
   to   { transform: translateX(-50%); }
 }
 
-/* Dive hint */
-.hint {
+/* ══════════════════════════════════════════════════════════════════════
+   SONAR DIVE HINT
+   Anchored to the horizon line (bottom: 43% + slight lift via transform)
+   ══════════════════════════════════════════════════════════════════════ */
+.sonar {
   position: absolute;
-  bottom: 46%;
+  bottom: 43%;
   left: 50%;
-  transform: translateX(-50%);
+  /* Center horizontally, lift the sonar dot to sit ON the horizon */
+  transform: translate(-50%, 50%);
+  z-index: 9;
   display: flex;
   flex-direction: column;
   align-items: center;
-  gap: 10px;
-  z-index: 7;
-  animation: floatHint 2.8s ease-in-out infinite, fadeUp 1.4s 1s both;
-  transition: opacity 0.3s;
+  gap: 18px;
+  pointer-events: none;
+  opacity: 0;
+  animation: sonarReveal 0.8s 1.8s forwards, sonarFloat 3.8s 2.6s ease-in-out infinite;
+  transition: opacity 0.5s ease;
 }
-.hintFade { opacity: 0; }
-
-@keyframes floatHint {
-  0%,100% { transform: translateX(-50%) translateY(0); }
-  50%      { transform: translateX(-50%) translateY(-7px); }
+.sonarFade {
+  opacity: 0 !important;
+  transition: opacity 0.3s ease !important;
 }
 
-.hintRings {
+@keyframes sonarReveal {
+  from { opacity: 0; transform: translate(-50%, 60%); }
+  to   { opacity: 1; transform: translate(-50%, 50%); }
+}
+@keyframes sonarFloat {
+  0%,100% { transform: translate(-50%, 50%) translateY(0px);  }
+  50%      { transform: translate(-50%, 50%) translateY(-7px); }
+}
+
+.sonarRings {
+  position: relative;
+  width: 124px;
+  height: 124px;
   display: flex;
   align-items: center;
-  gap: 5px;
+  justify-content: center;
 }
-.hintRings span {
-  display: block;
-  width: 5px;
-  height: 5px;
+
+.sonarRing {
+  position: absolute;
+  width:  var(--size);
+  height: var(--size);
   border-radius: 50%;
-  background: rgba(94,207,223,0.8);
-  animation: dotBounce 1.4s ease-in-out infinite;
+  border: 1px solid rgba(94,207,223,0.55);
+  animation: sonarExpand 2.8s ease-out var(--delay) infinite;
 }
-.hintRings span:nth-child(2) { animation-delay: 0.18s; }
-.hintRings span:nth-child(3) { animation-delay: 0.36s; }
-@keyframes dotBounce {
-  0%,100% { opacity: 0.3; transform: scale(0.8); }
-  50%      { opacity: 1;   transform: scale(1.4); }
+@keyframes sonarExpand {
+  0%   { transform: scale(0.05); opacity: 0.85; }
+  70%  { opacity: 0.20; }
+  100% { transform: scale(1.5);  opacity: 0; }
 }
 
-.hintText {
+.sonarDot {
+  position: absolute;
+  width: 7px;
+  height: 7px;
+  border-radius: 50%;
+  background: #5ecfdf;
+  box-shadow:
+    0 0 10px rgba(94,207,223,0.95),
+    0 0 28px rgba(94,207,223,0.55),
+    0 0 50px rgba(94,207,223,0.20);
+  animation: dotBreath 2s ease-in-out infinite;
+  z-index: 1;
+}
+@keyframes dotBreath {
+  0%,100% { transform: scale(1.0); }
+  50%      { transform: scale(1.6); }
+}
+
+.sonarText {
   font-family: var(--mono);
-  font-size: 10px;
-  letter-spacing: 0.3em;
+  font-size: 8px;
+  letter-spacing: 0.36em;
   text-transform: uppercase;
-  color: rgba(168,230,239,0.6);
+  color: rgba(168,230,239,0.46);
+  white-space: nowrap;
 }
 
-/* Dive flood — water rushes up from below */
+/* ── Flood overlay ───────────────────────────────────────────────────── */
 .flood {
   position: absolute;
   inset: 0;
@@ -211,24 +422,14 @@
   background: linear-gradient(to top, #041425 0%, #082240 40%, #0d5a7a 75%, #12899e 100%);
   transform: translateY(100%);
   pointer-events: none;
-  transition: none;
 }
 .flooding {
   animation: floodRise 1.05s cubic-bezier(0.16, 1, 0.3, 1) forwards;
 }
 @keyframes floodRise {
-  0%   { transform: translateY(100%); opacity: 0.85; }
-  60%  { transform: translateY(0%);   opacity: 1; }
+  0%   { transform: translateY(100%); opacity: 0.9; }
+  65%  { transform: translateY(0%);   opacity: 1; }
   100% { transform: translateY(0%);   opacity: 1; }
 }
 
-/* Diving state — whole landing fades after flood covers */
-.diving .sky,
-.diving .stars,
-.diving .sun,
-.diving .sunHalo,
-.diving .content,
-.diving .horizon,
-.diving .hint {
-  animation-play-state: paused;
-}
+.diving .sunCore { animation-play-state: paused; }

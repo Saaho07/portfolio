@@ -7,14 +7,13 @@
   overflow: hidden;
   opacity: 0;
   pointer-events: none;
-  transition: opacity 0.9s ease;
+  transition: opacity 1.1s ease;
 }
 .scene.visible {
   opacity: 1;
   pointer-events: all;
 }
 
-/* ── Canvas — offset so wheel is half off-screen LEFT ─────────────────────── */
 .canvas {
   position: absolute !important;
   inset: 0;
@@ -24,7 +23,6 @@
 
 /* ══════════════════════════════════════════════════════════════════════
    THEATRICAL WATER BACKGROUND
-   Each layer is a distinct colour band suggesting ocean depth strata.
    ══════════════════════════════════════════════════════════════════════ */
 .waterBg {
   position: absolute;
@@ -40,13 +38,11 @@
   will-change: opacity;
 }
 
-/* Layer 0 — Abyss: absolute black bottom */
 .wLayer[data-layer="0"] {
   background: radial-gradient(ellipse 160% 60% at 50% 100%, #000508 0%, #010812 50%, #000305 100%);
   z-index: 1;
 }
 
-/* Layer 1 — Trench: deep navy */
 .wLayer[data-layer="1"] {
   background: linear-gradient(to top,
     #020d1c 0%,
@@ -62,7 +58,6 @@
   to   { opacity: 0.98; }
 }
 
-/* Layer 2 — Ocean blue mid-zone */
 .wLayer[data-layer="2"] {
   background: linear-gradient(to top,
     #082240 0%,
@@ -79,7 +74,6 @@
   100% { opacity: 0.84; }
 }
 
-/* Layer 3 — Teal thermocline */
 .wLayer[data-layer="3"] {
   background:
     radial-gradient(ellipse 130% 50% at 50% 88%, #0d5a7a 0%, rgba(12,80,110,0.5) 40%, transparent 60%),
@@ -94,7 +88,6 @@
   100% { opacity: 0.78; }
 }
 
-/* Layer 4 — Caustic light shafts */
 .wLayer[data-layer="4"] {
   background:
     repeating-linear-gradient(
@@ -118,7 +111,6 @@
   100% { opacity: 0.70; filter: brightness(1.1); }
 }
 
-/* Layer 5 — Surface shimmer / god rays from above */
 .wLayer[data-layer="5"] {
   background:
     radial-gradient(ellipse 70% 40% at 50% 0%, rgba(94,207,223,0.50) 0%, transparent 52%),
@@ -139,7 +131,6 @@
   100% { filter: blur(4px) brightness(1.15); }
 }
 
-/* Vignette */
 .waterVignette {
   position: absolute;
   inset: 0;
@@ -148,7 +139,6 @@
   pointer-events: none;
 }
 
-/* Grain texture */
 .waterBg::after {
   content: '';
   position: absolute;
@@ -168,47 +158,46 @@
    CARDS
    ══════════════════════════════════════════════════════════════════════ */
 .card {
-  width: 172px;
-  background: rgba(4, 18, 32, 0.90);
-  backdrop-filter: blur(18px) saturate(1.3);
-  -webkit-backdrop-filter: blur(18px) saturate(1.3);
-  border-radius: 6px;
-  border: 1px solid rgba(94,207,223,0.14);
-  padding: 16px 14px 14px;
+  width: 175px;
+  background: rgba(4, 18, 32, 0.92);
+  backdrop-filter: blur(20px) saturate(1.4);
+  -webkit-backdrop-filter: blur(20px) saturate(1.4);
+  border-radius: 5px;
+  border: 1px solid rgba(94,207,223,0.12);
+  padding: 18px 15px 15px;
   position: relative;
   overflow: hidden;
   cursor: default;
-  box-shadow: 0 8px 36px rgba(0,0,0,0.65);
-  transition: border-color 0.3s, box-shadow 0.3s;
+  box-shadow:
+    0 8px 40px rgba(0,0,0,0.70),
+    inset 0 1px 0 rgba(255,255,255,0.03);
+  transition: border-color 0.4s, box-shadow 0.4s;
   will-change: transform, filter, opacity;
   transform-origin: center center;
 }
 
 .cardActive {
-  border-color: rgba(var(--accent-rgb, 94,207,223), 0.55) !important;
-  box-shadow:
-    0 12px 48px rgba(0,0,0,0.70),
-    0 0 0 1px rgba(94,207,223,0.15),
-    0 0 28px rgba(94,207,223,0.22),
-    0 0 56px rgba(94,207,223,0.10) !important;
   cursor: pointer;
-  animation: cardBreathe 3.5s ease-in-out infinite alternate;
-  border-color: color-mix(in srgb, var(--accent, #5ecfdf) 60%, transparent) !important;
+  border-color: color-mix(in srgb, var(--accent, #5ecfdf) 55%, transparent) !important;
   box-shadow:
-    0 12px 48px rgba(0,0,0,0.70),
-    0 0 28px color-mix(in srgb, var(--accent, #5ecfdf) 25%, transparent) !important;
+    0 14px 55px rgba(0,0,0,0.72),
+    0 0 0 1px rgba(94,207,223,0.12),
+    0 0 32px color-mix(in srgb, var(--accent, #5ecfdf) 28%, transparent),
+    0 0 64px color-mix(in srgb, var(--accent, #5ecfdf) 10%, transparent),
+    inset 0 1px 0 rgba(255,255,255,0.05) !important;
+  animation: cardBreathe 3.8s ease-in-out infinite alternate;
 }
 @keyframes cardBreathe {
   from { transform: scale(1.00) translateY(0px); }
-  to   { transform: scale(1.03) translateY(-4px); }
+  to   { transform: scale(1.025) translateY(-3px); }
 }
 
 .cardShimmer {
   position: absolute;
   inset: 0;
-  background: linear-gradient(115deg, transparent 20%, rgba(94,207,223,0.08) 50%, rgba(56,190,248,0.06) 80%, transparent 100%);
+  background: linear-gradient(115deg, transparent 20%, rgba(94,207,223,0.07) 50%, rgba(56,190,248,0.05) 80%, transparent 100%);
   background-size: 240% 100%;
-  animation: shimFlow 3.2s ease-in-out infinite;
+  animation: shimFlow 3.5s ease-in-out infinite;
   pointer-events: none;
   border-radius: inherit;
 }
@@ -220,18 +209,18 @@
 .cardTag {
   font-family: var(--mono);
   font-size: 6px;
-  letter-spacing: 0.30em;
+  letter-spacing: 0.32em;
   text-transform: uppercase;
   color: var(--gold);
   margin-bottom: 9px;
-  opacity: 0.85;
+  opacity: 0.82;
 }
 
 .cardTitle {
   font-family: var(--serif);
-  font-size: 0.9rem;
+  font-size: 0.92rem;
   font-weight: 600;
-  line-height: 1.18;
+  line-height: 1.16;
   color: #dff2fc;
   margin-bottom: 9px;
 }
@@ -243,11 +232,11 @@
 .cardBody {
   font-family: var(--mono);
   font-size: 7px;
-  line-height: 1.6;
-  color: rgba(168,230,239,0.62);
-  margin-bottom: 10px;
-  -webkit-mask-image: linear-gradient(to bottom, black 50%, transparent 92%);
-  mask-image: linear-gradient(to bottom, black 50%, transparent 92%);
+  line-height: 1.65;
+  color: rgba(168,230,239,0.58);
+  margin-bottom: 11px;
+  -webkit-mask-image: linear-gradient(to bottom, black 45%, transparent 90%);
+  mask-image: linear-gradient(to bottom, black 45%, transparent 90%);
 }
 
 .cardChips {
@@ -260,48 +249,49 @@
   font-family: var(--mono);
   font-size: 5.5px;
   letter-spacing: 0.08em;
-  padding: 2px 6px;
+  padding: 2px 7px;
   border-radius: 3px;
-  border: 1px solid rgba(56,190,248,0.20);
-  color: rgba(56,190,248,0.65);
+  border: 1px solid rgba(56,190,248,0.18);
+  color: rgba(56,190,248,0.60);
   background: rgba(0,18,42,0.5);
   white-space: nowrap;
 }
 .cardActive .chip {
-  border-color: color-mix(in srgb, var(--accent, #5ecfdf) 40%, transparent);
-  color: color-mix(in srgb, var(--accent, #5ecfdf) 85%, white);
+  border-color: color-mix(in srgb, var(--accent, #5ecfdf) 38%, transparent);
+  color: color-mix(in srgb, var(--accent, #5ecfdf) 82%, white);
 }
 
 .cardCta {
   display: flex;
   align-items: center;
   gap: 5px;
-  margin-top: 10px;
+  margin-top: 11px;
   font-family: var(--mono);
   font-size: 6px;
-  letter-spacing: 0.22em;
+  letter-spacing: 0.24em;
   text-transform: uppercase;
   color: color-mix(in srgb, var(--accent, #5ecfdf) 80%, white);
-  animation: ctaFade 1.5s ease-in-out infinite alternate;
+  animation: ctaFade 1.6s ease-in-out infinite alternate;
 }
 @keyframes ctaFade {
-  from { opacity: 0.5; }
+  from { opacity: 0.45; }
   to   { opacity: 1; }
 }
 .ctaDot {
   width: 4px; height: 4px;
   border-radius: 50%;
   background: var(--accent, #5ecfdf);
-  box-shadow: 0 0 6px var(--accent, #5ecfdf);
-  animation: ctaDot 1.2s ease-in-out infinite;
+  box-shadow: 0 0 7px var(--accent, #5ecfdf);
+  animation: ctaDotPulse 1.3s ease-in-out infinite;
+  flex-shrink: 0;
 }
-@keyframes ctaDot {
-  0%,100% { transform: scale(1); }
-  50%      { transform: scale(0.4); opacity: 0.3; }
+@keyframes ctaDotPulse {
+  0%,100% { transform: scale(1);   opacity: 1;   }
+  50%      { transform: scale(0.3); opacity: 0.2; }
 }
 
 /* ══════════════════════════════════════════════════════════════════════
-   CONTENT PANEL — leaks in from right like ink in water
+   CONTENT PANEL
    ══════════════════════════════════════════════════════════════════════ */
 .panel {
   position: absolute;
@@ -312,7 +302,6 @@
   overflow: hidden;
 }
 
-/* Ink-bleed background that seeps in */
 .panel::before {
   content: '';
   position: absolute;
@@ -337,7 +326,6 @@
   transform: translateX(0);
 }
 
-/* Ink leak rings — expand from left edge on open */
 .leakRings {
   position: absolute;
   left: -60px;
@@ -372,7 +360,6 @@
   100% { transform: translate(-50%,-50%) scale(1); opacity: 0; }
 }
 
-/* Panel content */
 .panelInner {
   position: relative;
   z-index: 32;
@@ -531,10 +518,10 @@
   font-weight: 400;
   line-height: 1;
   color: #5ecfdf;
-  text-shadow: 0 0 20px rgba(94,207,223,0.6);
+  text-shadow: 0 0 24px rgba(94,207,223,0.55);
 }
-.counterSep { font-size: 12px; color: rgba(94,207,223,0.28); }
-.counterTot { font-size: 13px; color: rgba(94,207,223,0.38); }
+.counterSep { font-size: 12px; color: rgba(94,207,223,0.26); }
+.counterTot { font-size: 13px; color: rgba(94,207,223,0.36); }
 
 .navBtns {
   display: flex;
@@ -543,29 +530,30 @@
 .navBtn {
   width: 36px; height: 36px;
   border-radius: 50%;
-  border: 1px solid rgba(94,207,223,0.22);
-  background: rgba(4,18,32,0.75);
+  border: 1px solid rgba(94,207,223,0.20);
+  background: rgba(4,18,32,0.78);
   backdrop-filter: blur(12px);
   color: #5ecfdf;
   font-size: 14px;
   display: flex; align-items: center; justify-content: center;
-  transition: border-color 0.2s, box-shadow 0.2s, transform 0.15s;
+  transition: border-color 0.2s, box-shadow 0.2s, transform 0.15s, background 0.2s;
 }
 .navBtn:hover {
-  border-color: rgba(94,207,223,0.65);
-  box-shadow: 0 0 14px rgba(94,207,223,0.35);
-  transform: scale(1.1);
+  border-color: rgba(94,207,223,0.60);
+  background: rgba(8,34,64,0.90);
+  box-shadow: 0 0 16px rgba(94,207,223,0.32);
+  transform: scale(1.12);
 }
-.navBtn:active { transform: scale(0.92); }
+.navBtn:active { transform: scale(0.90); }
 
 .scrollHint {
   display: flex;
   align-items: center;
   gap: 8px;
-  opacity: 0.32;
+  opacity: 0.28;
   transition: opacity 0.3s;
 }
-.scrollHint:hover { opacity: 0.62; }
+.scrollHint:hover { opacity: 0.58; }
 .hintLine {
   display: block;
   width: 22px; height: 1px;
@@ -580,7 +568,7 @@
   white-space: nowrap;
 }
 
-/* ── Focus dots — right column ─────────────────────────────────────────────── */
+/* ── Focus dots ────────────────────────────────────────────────────────────── */
 .focusDots {
   position: absolute;
   right: 28px;
@@ -594,13 +582,13 @@
 .focusDot {
   width: 5px; height: 5px;
   border-radius: 50%;
-  border: 1px solid rgba(168,230,239,0.30);
+  border: 1px solid rgba(168,230,239,0.28);
   background: transparent;
-  transition: background 0.3s, border-color 0.3s, transform 0.3s;
+  transition: background 0.35s, border-color 0.35s, transform 0.35s, box-shadow 0.35s;
 }
 .focusDotActive {
   background: var(--accent, #5ecfdf);
   border-color: var(--accent, #5ecfdf);
-  transform: scale(1.5);
-  box-shadow: 0 0 8px var(--accent, #5ecfdf);
+  transform: scale(1.6);
+  box-shadow: 0 0 10px var(--accent, #5ecfdf);
 }

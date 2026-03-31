@@ -6,20 +6,19 @@ import { CARDS, N } from '../../data/cards';
 import styles from './WheelScene3D.module.css';
 
 // ── Layout constants ──────────────────────────────────────────────────────────
-const WHEEL_R   = 3.2;   // spoke length (wheel radius)
-const SPOKE_N   = N;     // one spoke per card
-const CARD_W    = 1.6;
-const CARD_H    = 2.1;
-const WHEEL_X   = -3.5;  // wheel centre is left-of-screen
-const FOCUS_ANGLE = 0;   // rightward horizontal spoke is FOCUS (angle 0 = +X axis)
+const WHEEL_R     = 3.2;
+const SPOKE_N     = N;
+const CARD_W      = 1.65;
+const CARD_H      = 2.15;
+const WHEEL_X     = -3.5;
 
-// Shared mutable state (no re-render cost)
+// ── Shared mutable state (no re-render cost) ─────────────────────────────────
 const S = {
-  wheelAngle: 0,         // current rotation
-  targetAngle: 0,        // where we want to be
+  wheelAngle: 0,
+  targetAngle: 0,
   current: 0,
-  cardWorldPos: [],      // Vector3[] updated every frame
-  velocity: 0,
+  cardWorldPos: [],
+  vel: 0,
 };
 
 function spokeAngle(i) {
@@ -27,8 +26,17 @@ function spokeAngle(i) {
 }
 
 function targetForCard(i) {
-  // Rotate wheel so card i lands on the focus angle (0 = right / +X)
   return -(i / SPOKE_N) * Math.PI * 2;
+}
+
+// ── Smooth spring interpolation ───────────────────────────────────────────────
+// Critically-damped spring for buttery wheel feel
+function springStep(current, target, velRef, dt) {
+  const stiffness = 180;
+  const damping   = 22;
+  const diff = target - current;
+  velRef.v += (diff * stiffness - velRef.v * damping) * dt;
+  return current + velRef.v * dt;
 }
 
 // ── Water particle layer ──────────────────────────────────────────────────────
@@ -61,37 +69,35 @@ function BubbleLayer({ z, count, color, speed, spread }) {
       <bufferGeometry>
         <bufferAttribute attach="attributes-position" count={count} array={pos} itemSize={3} />
       </bufferGeometry>
-      <pointsMaterial color={color} size={0.04} transparent opacity={0.4} sizeAttenuation depthWrite={false} />
+      <pointsMaterial color={color} size={0.04} transparent opacity={0.38} sizeAttenuation depthWrite={false} />
     </points>
   );
 }
 
-// ── Hub — ornate centre of wheel ──────────────────────────────────────────────
+// ── Hub ───────────────────────────────────────────────────────────────────────
 function Hub({ accent }) {
-  const core = useRef();
+  const core  = useRef();
   const ring1 = useRef();
   const ring2 = useRef();
 
-  const ring1Pts = useMemo(() => {
-    return Array.from({ length: 65 }, (_, i) => {
+  const ring1Pts = useMemo(() =>
+    Array.from({ length: 65 }, (_, i) => {
       const a = (i / 64) * Math.PI * 2;
       return [Math.cos(a) * 0.38, Math.sin(a) * 0.38, 0];
-    });
-  }, []);
+    }), []);
 
-  const ring2Pts = useMemo(() => {
-    return Array.from({ length: 65 }, (_, i) => {
+  const ring2Pts = useMemo(() =>
+    Array.from({ length: 65 }, (_, i) => {
       const a = (i / 64) * Math.PI * 2;
       return [Math.cos(a) * 0.60, Math.sin(a) * 0.60, Math.sin(a * 3) * 0.04];
-    });
-  }, []);
+    }), []);
 
   useFrame(({ clock }) => {
     const t = clock.getElapsedTime();
     if (core.current) {
       core.current.material.emissiveIntensity = 0.5 + Math.sin(t * 2) * 0.25;
     }
-    if (ring1.current) ring1.current.rotation.z = t * 0.38;
+    if (ring1.current) ring1.current.rotation.z =  t * 0.38;
     if (ring2.current) ring2.current.rotation.z = -t * 0.22;
   });
 
@@ -121,34 +127,13 @@ function Spoke({ angle, active, accent, len }) {
   const end   = [Math.cos(angle) * len, Math.sin(angle) * len, 0];
   const start = [Math.cos(angle) * 0.65, Math.sin(angle) * 0.65, 0];
 
-  // Dashed spoke using multiple short segments
-  const pts = useMemo(() => {
-    const arr = [];
-    const segs = 10;
-    for (let s = 0; s < segs; s++) {
-      const t0 = (s + 0.1) / segs;
-      const t1 = (s + 0.72) / segs;
-      arr.push([
-        start[0] + (end[0] - start[0]) * t0,
-        start[1] + (end[1] - start[1]) * t0,
-        0,
-      ]);
-      arr.push([
-        start[0] + (end[0] - start[0]) * t1,
-        start[1] + (end[1] - start[1]) * t1,
-        0,
-      ]);
-    }
-    return arr;
-  }, [angle, len]); // eslint-disable-line
-
   useFrame(({ clock }) => {
     const line = ref.current?.children[0];
     if (line?.material) {
       const t = clock.getElapsedTime();
       line.material.opacity = active
-        ? 0.75 + Math.sin(t * 2.5) * 0.2
-        : 0.18 + Math.sin(t * 0.8 + angle) * 0.05;
+        ? 0.78 + Math.sin(t * 2.5) * 0.18
+        : 0.15 + Math.sin(t * 0.8 + angle) * 0.04;
     }
   });
 
@@ -157,15 +142,15 @@ function Spoke({ angle, active, accent, len }) {
       <Line
         points={[start, end]}
         color={active ? accent : '#2a6a8a'}
-        lineWidth={active ? 1.8 : 0.6}
+        lineWidth={active ? 2.0 : 0.7}
         transparent
-        opacity={active ? 0.8 : 0.2}
+        opacity={active ? 0.85 : 0.18}
       />
     </group>
   );
 }
 
-// ── Card plate (3D frame behind the HTML card) ────────────────────────────────
+// ── Card plate ────────────────────────────────────────────────────────────────
 function CardPlate({ angle, active, accent }) {
   const grp   = useRef();
   const frame = useRef();
@@ -176,13 +161,12 @@ function CardPlate({ angle, active, accent }) {
   useFrame(({ clock }) => {
     const t = clock.getElapsedTime();
     if (!grp.current) return;
-    // Counter-rotate so card always faces camera despite wheel spin
     grp.current.rotation.z = -S.wheelAngle - angle;
 
     if (frame.current?.material) {
       frame.current.material.opacity = active
-        ? 0.85 + Math.sin(t * 2.2) * 0.08
-        : 0.22;
+        ? 0.88 + Math.sin(t * 2.2) * 0.08
+        : 0.20;
     }
     if (glow.current?.material) {
       glow.current.material.opacity = active
@@ -193,13 +177,11 @@ function CardPlate({ angle, active, accent }) {
 
   return (
     <group position={[x, y, 0]}>
-      {/* glow behind */}
       <mesh ref={glow} position={[0, 0, -0.15]}>
         <planeGeometry args={[CARD_W + 1.2, CARD_H + 1.2]} />
         <meshBasicMaterial color={accent} transparent opacity={0} depthWrite={false} />
       </mesh>
       <group ref={grp}>
-        {/* card backing */}
         <mesh position={[0, 0, -0.04]}>
           <boxGeometry args={[CARD_W, CARD_H, 0.05]} />
           <meshStandardMaterial
@@ -210,7 +192,6 @@ function CardPlate({ angle, active, accent }) {
             opacity={active ? 0.92 : 0.78}
           />
         </mesh>
-        {/* edge frame */}
         <lineSegments ref={frame}>
           <edgesGeometry args={[new THREE.BoxGeometry(CARD_W + 0.02, CARD_H + 0.02, 0.06)]} />
           <lineBasicMaterial color={active ? accent : '#194a68'} transparent opacity={0.25} />
@@ -220,30 +201,28 @@ function CardPlate({ angle, active, accent }) {
   );
 }
 
-// ── WheelMesh — rotates, positions all 3D geometry ───────────────────────────
+// ── WheelMesh — spring physics ────────────────────────────────────────────────
 function WheelMesh({ current, accent }) {
-  const grp     = useRef();
-  const rimRef  = useRef();
-  const tmp     = useMemo(() => new THREE.Vector3(), []);
+  const grp    = useRef();
+  const tmp    = useMemo(() => new THREE.Vector3(), []);
+  const velRef = useRef({ v: 0 });
 
-  const rimPts = useMemo(() => {
-    return Array.from({ length: 129 }, (_, i) => {
+  const rimPts = useMemo(() =>
+    Array.from({ length: 129 }, (_, i) => {
       const a = (i / 128) * Math.PI * 2;
       return [Math.cos(a) * WHEEL_R, Math.sin(a) * WHEEL_R, 0];
-    });
-  }, []);
+    }), []);
 
   useFrame((_, dt) => {
+    // Clamp dt to avoid huge jumps on tab switch
+    const safeDt = Math.min(dt, 0.05);
+
     // Spring toward target
-    const diff = S.targetAngle - S.wheelAngle;
-    S.velocity += diff * 0.12;
-    S.velocity *= 0.82;
-    S.wheelAngle += S.velocity * dt * 60;
+    S.wheelAngle = springStep(S.wheelAngle, S.targetAngle, velRef.current, safeDt);
 
     if (grp.current) {
       grp.current.rotation.z = S.wheelAngle;
 
-      // Record world positions for HtmlCards
       for (let i = 0; i < SPOKE_N; i++) {
         const a = spokeAngle(i);
         tmp.set(Math.cos(a) * WHEEL_R, Math.sin(a) * WHEEL_R, 0);
@@ -257,10 +236,7 @@ function WheelMesh({ current, accent }) {
   return (
     <group ref={grp} position={[WHEEL_X, 0, 0]}>
       <Hub accent={accent} />
-      {/* Rim */}
-      <Line points={rimPts} color="#1a6080" lineWidth={0.5} transparent opacity={0.22} />
-
-      {/* Spokes & plates */}
+      <Line points={rimPts} color="#1a6080" lineWidth={0.5} transparent opacity={0.20} />
       {Array.from({ length: SPOKE_N }, (_, i) => {
         const a = spokeAngle(i);
         const active = i === current;
@@ -275,7 +251,7 @@ function WheelMesh({ current, accent }) {
   );
 }
 
-// ── HtmlCard — positioned via world-space tracking ────────────────────────────
+// ── HtmlCard ──────────────────────────────────────────────────────────────────
 function HtmlCard({ card, idx, active, onClick }) {
   const grpRef = useRef();
   const divRef = useRef();
@@ -286,19 +262,16 @@ function HtmlCard({ card, idx, active, onClick }) {
       grpRef.current.position.copy(wp);
     }
 
-    if (divRef.current) {
-      // Blur non-focused cards
-      const wp2 = S.cardWorldPos[idx];
-      if (wp2) {
-        // Distance from focus spoke (world X near WHEEL_X + WHEEL_R)
-        const focusX = WHEEL_X + WHEEL_R;
-        const dist = Math.abs(wp2.x - focusX) + Math.abs(wp2.y) * 0.5;
-        const blur = Math.max(0, dist * 1.1 - 0.6);
-        const sc   = active ? 1 : Math.max(0.82, 1 - dist * 0.04);
-        divRef.current.style.filter  = blur > 0.1 ? `blur(${blur.toFixed(1)}px)` : '';
-        divRef.current.style.opacity = active ? '1' : `${Math.max(0.3, 1 - dist * 0.18)}`;
-        divRef.current.style.transform = `scale(${sc})`;
-      }
+    if (divRef.current && wp) {
+      const focusX = WHEEL_X + WHEEL_R;
+      const dist   = Math.abs(wp.x - focusX) + Math.abs(wp.y) * 0.55;
+      const blur   = Math.max(0, dist * 1.0 - 0.5);
+      const sc     = active ? 1 : Math.max(0.80, 1 - dist * 0.038);
+      const op     = active ? 1 : Math.max(0.22, 1 - dist * 0.20);
+
+      divRef.current.style.filter    = blur > 0.08 ? `blur(${blur.toFixed(2)}px)` : '';
+      divRef.current.style.opacity   = `${op}`;
+      divRef.current.style.transform = `scale(${sc})`;
     }
   });
 
@@ -339,7 +312,7 @@ function HtmlCard({ card, idx, active, onClick }) {
   );
 }
 
-// ── Focus indicator — glowing line on the right-horizontal axis ───────────────
+// ── Focus dashed line ─────────────────────────────────────────────────────────
 function FocusLine({ accent }) {
   const ref = useRef();
   const pts = [
@@ -350,38 +323,33 @@ function FocusLine({ accent }) {
   useFrame(({ clock }) => {
     const line = ref.current?.children[0];
     if (line?.material) {
-      line.material.opacity = 0.18 + Math.sin(clock.getElapsedTime() * 1.4) * 0.08;
+      line.material.opacity = 0.16 + Math.sin(clock.getElapsedTime() * 1.4) * 0.07;
     }
   });
   return (
     <group ref={ref}>
-      <Line points={pts} color={accent} lineWidth={0.7} transparent opacity={0.22} dashed dashSize={0.18} gapSize={0.10} />
+      <Line points={pts} color={accent} lineWidth={0.7} transparent opacity={0.20} dashed dashSize={0.18} gapSize={0.10} />
     </group>
   );
 }
 
-// ── Scene root (inside Canvas) ────────────────────────────────────────────────
+// ── Scene root ────────────────────────────────────────────────────────────────
 function Scene({ current, accent, onCardClick }) {
   return (
     <>
       <ambientLight intensity={0.5} color="#c8eeff" />
-      <pointLight position={[WHEEL_X, 0, 6]} intensity={2.5} color={accent} distance={14} decay={2} />
-      <pointLight position={[-8, 6, -2]}       intensity={1.2} color="#a78bfa" distance={20} decay={2} />
-      <pointLight position={[4, -4, -1]}        intensity={1.0} color="#38bdf8" distance={18} decay={2} />
+      <pointLight position={[WHEEL_X, 0, 6]}  intensity={2.5} color={accent}    distance={14} decay={2} />
+      <pointLight position={[-8, 6, -2]}        intensity={1.2} color="#a78bfa"   distance={20} decay={2} />
+      <pointLight position={[4, -4, -1]}         intensity={1.0} color="#38bdf8"   distance={18} decay={2} />
 
-      {/* Bubble layers */}
-      <BubbleLayer z={-8} count={60} color="#0d5a7a" speed={0.35} spread={20} />
-      <BubbleLayer z={-4} count={55} color="#12899e" speed={0.60} spread={16} />
-      <BubbleLayer z={-1} count={40} color="#5ecfdf" speed={0.95} spread={12} />
-      <BubbleLayer z={ 2} count={25} color="#a8e6ef" speed={1.40} spread={8}  />
+      <BubbleLayer z={-8} count={55}  color="#0d5a7a" speed={0.35} spread={20} />
+      <BubbleLayer z={-4} count={50}  color="#12899e" speed={0.60} spread={16} />
+      <BubbleLayer z={-1} count={38}  color="#5ecfdf" speed={0.95} spread={12} />
+      <BubbleLayer z={ 2} count={22}  color="#a8e6ef" speed={1.40} spread={8}  />
 
-      {/* Focus axis dashed line */}
       <FocusLine accent={accent} />
-
-      {/* The wheel */}
       <WheelMesh current={current} accent={accent} />
 
-      {/* HTML cards overlay */}
       {CARDS.map((card, i) => (
         <HtmlCard
           key={i}
@@ -410,18 +378,14 @@ function ContentPanel({ card, open, onClose }) {
 
   return (
     <div className={`${styles.panel} ${open ? styles.panelOpen : ''}`}>
-      {/* Ink leak rings */}
       <div className={styles.leakRings}>
         <span /><span /><span /><span />
       </div>
-
       <div className={styles.panelInner}>
         <button className={styles.panelClose} onClick={onClose} aria-label="Close">
           <span>×</span>
         </button>
-
         <p className={styles.panelTag} style={{ '--accent': shown.accent }}>{shown.tag}</p>
-
         <h2 className={styles.panelTitle} style={{ '--accent': shown.accent }}>
           {shown.title.map((line, i) => (
             <span key={i}>
@@ -430,12 +394,8 @@ function ContentPanel({ card, open, onClose }) {
             </span>
           ))}
         </h2>
-
         <div className={styles.panelRule} style={{ background: shown.accent }} />
-
         <p className={styles.panelBody}>{shown.body}</p>
-
-        {/* Detail grid */}
         {shown.detail && (
           <div className={styles.panelDetails}>
             {shown.detail.map(d => (
@@ -446,7 +406,6 @@ function ContentPanel({ card, open, onClose }) {
             ))}
           </div>
         )}
-
         <div className={styles.panelChips}>
           {shown.chips.map(ch => (
             <span key={ch} className={styles.panelChip} style={{ '--accent': shown.accent }}>{ch}</span>
@@ -457,21 +416,16 @@ function ContentPanel({ card, open, onClose }) {
   );
 }
 
-// ── Theatrical water background layers ───────────────────────────────────────
+// ── Water background ──────────────────────────────────────────────────────────
 function WaterBackground() {
   return (
     <div className={styles.waterBg} aria-hidden="true">
-      {/* Abyss floor */}
       <div className={styles.wLayer} data-layer="0" />
-      {/* Deep strata */}
       <div className={styles.wLayer} data-layer="1" />
       <div className={styles.wLayer} data-layer="2" />
       <div className={styles.wLayer} data-layer="3" />
-      {/* Caustic light shafts */}
       <div className={styles.wLayer} data-layer="4" />
-      {/* Surface shimmer */}
       <div className={styles.wLayer} data-layer="5" />
-      {/* Vignette overlay */}
       <div className={styles.waterVignette} />
     </div>
   );
@@ -499,7 +453,7 @@ function NavUI({ current, total, onPrev, onNext }) {
   );
 }
 
-// ── Focus indicator dots (right side, shows which spoke is active) ────────────
+// ── Focus dots ────────────────────────────────────────────────────────────────
 function FocusDots({ current }) {
   return (
     <div className={styles.focusDots}>
@@ -517,17 +471,19 @@ function FocusDots({ current }) {
 // ── Main Export ───────────────────────────────────────────────────────────────
 export default function WheelScene3D({ visible }) {
   const [current, setCurrent] = useState(0);
-  const [panelCard, setPanelCard] = useState(null);
-  const [panelOpen, setPanelOpen] = useState(false);
+  const [panelCard, setPanelCard]   = useState(null);
+  const [panelOpen, setPanelOpen]   = useState(false);
+
+  // Scroll accumulator — debounced, with velocity feel
+  const scrollAcc = useRef({ delta: 0, timer: null, locked: false });
 
   const accent = CARDS[current]?.accent ?? '#5ecfdf';
 
-  // Navigation
   const goTo = useCallback((idx) => {
     const i = ((idx % N) + N) % N;
     setCurrent(i);
-    S.current = i;
-    S.targetAngle = targetForCard(i);
+    S.current      = i;
+    S.targetAngle  = targetForCard(i);
     setPanelOpen(false);
   }, []);
 
@@ -536,29 +492,46 @@ export default function WheelScene3D({ visible }) {
 
   const handleCardClick = useCallback((idx) => {
     if (idx !== current) { goTo(idx); return; }
-    if (panelOpen) { setPanelOpen(false); }
-    else           { setPanelCard(CARDS[idx]); requestAnimationFrame(() => setPanelOpen(true)); }
+    if (panelOpen) setPanelOpen(false);
+    else { setPanelCard(CARDS[idx]); requestAnimationFrame(() => setPanelOpen(true)); }
   }, [current, panelOpen, goTo]);
 
-  // Scroll
+  // ── Improved scroll handler ───────────────────────────────────────────────
   useEffect(() => {
-    const acc = { v: 0, timer: null };
+    const acc = scrollAcc.current;
+
     const onWheel = (e) => {
       if (!visible) return;
       e.preventDefault();
-      acc.v += e.deltaY;
+
+      // Ignore tiny trackpad micro-deltas
+      const d = e.deltaY;
+      if (Math.abs(d) < 2) return;
+
+      acc.delta += d;
       clearTimeout(acc.timer);
+
+      // Commit navigation after brief quiet period
       acc.timer = setTimeout(() => {
-        if (acc.v > 30) next();
-        else if (acc.v < -30) prev();
-        acc.v = 0;
-      }, 80);
+        if (acc.locked) { acc.delta = 0; return; }
+        if (acc.delta > 25) {
+          next();
+          acc.locked = true;
+          setTimeout(() => { acc.locked = false; }, 780);
+        } else if (acc.delta < -25) {
+          prev();
+          acc.locked = true;
+          setTimeout(() => { acc.locked = false; }, 780);
+        }
+        acc.delta = 0;
+      }, 60);
     };
+
     window.addEventListener('wheel', onWheel, { passive: false });
     return () => window.removeEventListener('wheel', onWheel);
   }, [visible, next, prev]);
 
-  // Keyboard
+  // ── Keyboard ──────────────────────────────────────────────────────────────
   useEffect(() => {
     const onKey = (e) => {
       if (!visible) return;
@@ -570,19 +543,16 @@ export default function WheelScene3D({ visible }) {
     return () => window.removeEventListener('keydown', onKey);
   }, [visible, next, prev]);
 
-  // Sync S.wheelAngle init
+  // ── Init ──────────────────────────────────────────────────────────────────
   useEffect(() => {
-    S.targetAngle = targetForCard(0);
-    S.wheelAngle  = targetForCard(0);
+    S.targetAngle  = targetForCard(0);
+    S.wheelAngle   = targetForCard(0);
     S.cardWorldPos = new Array(N).fill(null).map(() => new THREE.Vector3());
   }, []);
 
   return (
     <div className={`${styles.scene} ${visible ? styles.visible : ''}`}>
-      {/* ── Theatrical layered water background ── */}
       <WaterBackground />
-
-      {/* ── WebGL canvas — wheel lives here ── */}
       <Canvas
         className={styles.canvas}
         camera={{ position: [0, 0, 9], fov: 48, near: 0.1, far: 80 }}
@@ -591,14 +561,8 @@ export default function WheelScene3D({ visible }) {
       >
         <Scene current={current} accent={accent} onCardClick={handleCardClick} />
       </Canvas>
-
-      {/* ── Navigation UI ── */}
       <NavUI current={current} total={N} onPrev={prev} onNext={next} />
-
-      {/* ── Focus dots ── */}
       <FocusDots current={current} />
-
-      {/* ── Content panel — leaks in from right ── */}
       <ContentPanel card={panelCard} open={panelOpen} onClose={() => setPanelOpen(false)} />
     </div>
   );
