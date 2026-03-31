@@ -1,0 +1,101 @@
+.panel {
+  position: absolute;
+  right: 0;
+  top: 0;
+  bottom: 0;
+  width: 50%;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  padding: 0 64px 0 48px;
+  z-index: 6;
+  /* Subtle left separator */
+  border-left: 1px solid rgba(168, 216, 234, 0.06);
+}
+
+/* Staggered reveal */
+.eyebrow,
+.title,
+.divider,
+.body,
+.tags {
+  opacity: 0;
+  transform: translateY(16px);
+  transition: opacity 0.6s ease, transform 0.6s ease;
+}
+
+.panel.visible .eyebrow { opacity: 1; transform: none; transition-delay: 0s; }
+.panel.visible .title   { opacity: 1; transform: none; transition-delay: 0.07s; }
+.panel.visible .divider { opacity: 1; transform: none; transition-delay: 0.14s; }
+.panel.visible .body    { opacity: 1; transform: none; transition-delay: 0.2s; }
+.panel.visible .tags    { opacity: 1; transform: none; transition-delay: 0.28s; }
+
+/* Eyebrow — smallest, gold, mono */
+.eyebrow {
+  font-family: var(--mono);
+  font-size: 10px;
+  letter-spacing: 0.32em;
+  text-transform: uppercase;
+  color: var(--gold);
+  margin-bottom: 20px;
+  opacity: 0.85;
+}
+
+/* Title — large, elegant serif */
+.title {
+  font-family: var(--serif);
+  font-weight: 300;
+  font-size: clamp(2.4rem, 3.8vw, 3.8rem);
+  color: var(--light);
+  line-height: 1.08;
+  letter-spacing: -0.01em;
+  margin-bottom: 0;
+}
+
+.title em {
+  font-style: italic;
+  color: rgba(168, 216, 234, 0.92);
+  font-weight: 300;
+}
+
+/* Thin rule between title and body */
+.divider {
+  width: 40px;
+  height: 1px;
+  background: rgba(168, 216, 234, 0.25);
+  margin: 28px 0;
+  flex-shrink: 0;
+}
+
+/* Body — mono, comfortable line-height */
+.body {
+  font-family: var(--mono);
+  font-size: 12.5px;
+  line-height: 2;
+  color: rgba(168, 216, 234, 0.62);
+  max-width: 380px;
+}
+
+/* Tags */
+.tags {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  margin-top: 32px;
+}
+
+.tag {
+  font-family: var(--mono);
+  font-size: 9.5px;
+  letter-spacing: 0.16em;
+  padding: 6px 16px;
+  border: 1px solid rgba(201, 168, 76, 0.3);
+  color: rgba(201, 168, 76, 0.8);
+  text-transform: uppercase;
+  transition: border-color 0.2s, color 0.2s;
+}
+
+.tag:hover {
+  border-color: rgba(201, 168, 76, 0.7);
+  color: var(--gold);
+}

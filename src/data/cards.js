@@ -1,0 +1,88 @@
+export const CARDS = [
+  {
+    tag: 'Game Development',
+    title: ['Pixel', 'Action', 'RPG'],
+    titleEm: 1,
+    body: 'A handcrafted action RPG built on a custom engine from the ground up. Pixel art aesthetics meet deep systems design — combat, world state, and narrative all running on bespoke architecture.',
+    chips: ['Custom Engine', 'Pixel Art', 'C++', 'GLSL', 'ECS'],
+    accent: '#e87a5a',
+    detail: [
+      { label: 'Status',   value: 'In Development' },
+      { label: 'Engine',   value: 'Custom / Homegrown' },
+      { label: 'Renderer', value: 'OpenGL + GLSL' },
+      { label: 'Pattern',  value: 'Entity-Component-System' },
+    ],
+  },
+  {
+    tag: 'Linux Rice',
+    title: ['Caelestia', 'Desktop', 'Environment'],
+    titleEm: 0,
+    body: 'A meticulously crafted Arch Linux + Hyprland setup. Quickshell-based shell, material colour engine that derives the entire palette from wallpaper. Every pixel considered.',
+    chips: ['Arch Linux', 'Hyprland', 'Quickshell', 'Nix', 'SCSS'],
+    accent: '#b8a0e8',
+    detail: [
+      { label: 'WM',      value: 'Hyprland (Wayland)' },
+      { label: 'Shell',   value: 'Quickshell' },
+      { label: 'Colours', value: 'Material You engine' },
+      { label: 'Distro',  value: 'Arch Linux' },
+    ],
+  },
+  {
+    tag: 'OS Development',
+    title: ['Systems', 'from', 'Scratch'],
+    titleEm: 2,
+    body: 'Low-level OS experiments — bootloaders, kernel modules, memory management. Pushing into the metal to understand how computers actually work beneath all abstraction.',
+    chips: ['C', 'Assembly', 'QEMU', 'Bootloader', 'x86'],
+    accent: '#5ecfdf',
+    detail: [
+      { label: 'Lang',   value: 'C & x86 Assembly' },
+      { label: 'Target', value: 'x86 / bare metal' },
+      { label: 'Tools',  value: 'QEMU, GDB, GRUB' },
+      { label: 'Focus',  value: 'Memory, Scheduling' },
+    ],
+  },
+  {
+    tag: 'Web Development',
+    title: ['Immersive', 'Web', 'Experiences'],
+    titleEm: 0,
+    body: 'Creative frontends with Three.js, React, and raw WebGL. Where physics meets canvas — building worlds that exist inside a browser tab.',
+    chips: ['Three.js', 'React', 'GLSL', 'GSAP', 'WebGL'],
+    accent: '#12899e',
+    detail: [
+      { label: 'Stack',  value: 'React + Vite' },
+      { label: '3D',     value: 'Three.js / R3F' },
+      { label: 'Shader', value: 'GLSL custom' },
+      { label: 'Anim',   value: 'GSAP + CSS' },
+    ],
+  },
+  {
+    tag: 'Project Management',
+    title: ['Leading', 'with', 'Clarity'],
+    titleEm: 2,
+    body: 'Coordinating cross-functional teams and shipping complex software on time. Systems thinking applied to people, process, and product — because good code needs good context.',
+    chips: ['Agile', 'Planning', 'Communication', 'Strategy'],
+    accent: '#c9a84c',
+    detail: [
+      { label: 'Method',  value: 'Agile / iterative' },
+      { label: 'Scope',   value: 'Cross-functional' },
+      { label: 'Focus',   value: 'Shipping, clarity' },
+      { label: 'Output',  value: 'Software products' },
+    ],
+  },
+  {
+    tag: 'Languages',
+    title: ['Speaking', 'Worlds', 'Apart'],
+    titleEm: 1,
+    body: 'Fluent across multiple human languages — a curiosity for how language shapes thought, culture, and communication. Bridging technical precision with cultural nuance.',
+    chips: ['Hindi', 'English', 'Punjabi', ],
+    accent: '#7a5abf',
+    detail: [
+      { label: 'Native',  value: 'Hindi / Punjabi' },
+      { label: 'Fluent',  value: 'English, Urdu' },
+      { label: 'Scripts', value: 'Devanagari, Latin' },
+      { label: 'Interest', value: 'Linguistics' },
+    ],
+  },
+];
+
+export const N = CARDS.length;
