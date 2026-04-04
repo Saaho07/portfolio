@@ -1,0 +1,81 @@
+.overlay {
+  position: fixed;
+  inset: 0;
+  z-index: 50;
+  pointer-events: none;
+  overflow: hidden;
+}
+
+.waterFill {
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(
+    to top,
+    #000508 0%,
+    #020d1c 18%,
+    #041425 35%,
+    #082240 55%,
+    #0a3a5c 72%,
+    #0d5a7a 88%,
+    #12899e 100%
+  );
+  transform: translateY(0%);
+  opacity: 1;
+  transition: opacity 0.55s ease 0.4s;
+}
+
+.overlay.dissolve .waterFill {
+  opacity: 0;
+}
+
+.causticFlash {
+  position: absolute;
+  inset: 0;
+  background: radial-gradient(
+    ellipse 80% 40% at 50% 30%,
+    rgba(94, 207, 223, 0.22) 0%,
+    rgba(20, 100, 140, 0.12) 40%,
+    transparent 70%
+  );
+  opacity: 0;
+  transition: opacity 0.12s ease;
+}
+
+.overlay.rush .causticFlash {
+  opacity: 1;
+}
+
+.overlay.dissolve .causticFlash {
+  opacity: 0;
+  transition: opacity 0.4s ease;
+}
+
+.surfaceRefraction {
+  position: absolute;
+  top: 0; left: 0; right: 0;
+  height: 60%;
+  background: repeating-linear-gradient(
+    92deg,
+    transparent 0%, transparent 8%,
+    rgba(94,207,223,0.06) 10%, transparent 12%
+  );
+  opacity: 0;
+  animation: none;
+}
+
+.overlay.rush .surfaceRefraction {
+  opacity: 1;
+  animation: refractionDrift 0.8s ease-out forwards;
+}
+
+@keyframes refractionDrift {
+  0%  { transform: scaleY(0.3) translateY(-30%); opacity: 0.8; }
+  60% { opacity: 0.4; }
+  100% { transform: scaleY(1) translateY(0); opacity: 0; }
+}
+
+.bubbleCanvas {
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+}

@@ -1,9 +1,6 @@
 import { useRef, useEffect, useState, useCallback } from 'react';
 import styles from './Landing.module.css';
 
-// ─────────────────────────────────────────────────────────────────────────────
-// Star canvas — with occasional shooting stars
-// ─────────────────────────────────────────────────────────────────────────────
 function StarCanvas({ diving }) {
   const canvasRef = useRef(null);
   const animRef   = useRef(null);
@@ -20,7 +17,6 @@ function StarCanvas({ diving }) {
     resize();
     window.addEventListener('resize', resize);
 
-    // Regular stars — only in top 55% of screen
     const stars = Array.from({ length: 160 }, () => ({
       x:  Math.random(),
       y:  Math.random() * 0.55,
@@ -30,14 +26,13 @@ function StarCanvas({ diving }) {
       twinkleOffset: Math.random() * Math.PI * 2,
     }));
 
-    // Shooting stars pool
     const shooters = [];
     let shooterTimer = 0;
 
     const spawnShooter = () => {
       shooters.push({
-        x:   Math.random() * 0.7 + 0.1,
-        y:   Math.random() * 0.3,
+        x: Math.random() * 0.7 + 0.1,
+        y: Math.random() * 0.3,
         len: 0.06 + Math.random() * 0.09,
         spd: 0.003 + Math.random() * 0.004,
         ang: Math.PI / 4 + (Math.random() - 0.5) * 0.4,
@@ -55,7 +50,6 @@ function StarCanvas({ diving }) {
       t += 0.016;
       ctx.clearRect(0, 0, W, H);
 
-      // Stars
       stars.forEach(s => {
         const pulse = Math.sin(t * 0.8 + s.twinkleOffset);
         s.a = Math.max(0.08, Math.min(1, s.a + s.da));
@@ -70,7 +64,6 @@ function StarCanvas({ diving }) {
         ctx.fill();
       });
 
-      // Shooting stars
       shooterTimer += 0.016;
       if (shooterTimer > 3.5 + Math.random() * 4) {
         spawnShooter();
@@ -109,12 +102,9 @@ function StarCanvas({ diving }) {
   return <canvas ref={canvasRef} className={`${styles.stars} ${diving ? styles.starsFade : ''}`} />;
 }
 
-// ─────────────────────────────────────────────────────────────────────────────
-// Ripple canvas — cursor ripples on the water surface
-// ─────────────────────────────────────────────────────────────────────────────
 function RippleCanvas() {
-  const canvasRef = useRef(null);
-  const animRef   = useRef(null);
+  const canvasRef  = useRef(null);
+  const animRef    = useRef(null);
   const ripplesRef = useRef([]);
 
   useEffect(() => {
@@ -129,11 +119,8 @@ function RippleCanvas() {
     resize();
     window.addEventListener('resize', resize);
 
-    const spawnRipple = (x, y) => {
-      ripplesRef.current.push({ x, y, r: 0, life: 1.0 });
-    };
+    const spawnRipple = (x, y) => ripplesRef.current.push({ x, y, r: 0, life: 1.0 });
 
-    // Gentle ambient ripples along horizon
     let ambientTimer = 0;
     const spawnAmbient = () => {
       const { width: W, height: H } = canvas;
@@ -167,17 +154,13 @@ function RippleCanvas() {
       ctx.clearRect(0, 0, W, H);
 
       ambientTimer += 0.016;
-      if (ambientTimer > 1.8 + Math.random() * 2.4) {
-        spawnAmbient();
-        ambientTimer = 0;
-      }
+      if (ambientTimer > 1.8 + Math.random() * 2.4) { spawnAmbient(); ambientTimer = 0; }
 
       for (let i = ripplesRef.current.length - 1; i >= 0; i--) {
         const rp = ripplesRef.current[i];
         rp.r    += 2.2;
         rp.life -= 0.018;
         if (rp.life <= 0) { ripplesRef.current.splice(i, 1); continue; }
-
         ctx.beginPath();
         ctx.ellipse(rp.x, rp.y, rp.r * 1.8, rp.r * 0.45, 0, 0, Math.PI * 2);
         ctx.strokeStyle = `rgba(94,207,223,${rp.life * 0.22})`;
@@ -201,13 +184,10 @@ function RippleCanvas() {
   return <canvas ref={canvasRef} className={styles.rippleCanvas} />;
 }
 
-// ─────────────────────────────────────────────────────────────────────────────
-// Parallax layer wrapper
-// ─────────────────────────────────────────────────────────────────────────────
 function useParallax() {
-  const mouseRef = useRef({ x: 0, y: 0 });
+  const mouseRef  = useRef({ x: 0, y: 0 });
   const smoothRef = useRef({ x: 0, y: 0 });
-  const rafRef = useRef(null);
+  const rafRef    = useRef(null);
 
   useEffect(() => {
     const onMove = (e) => {
@@ -232,9 +212,6 @@ function useParallax() {
   return smoothRef;
 }
 
-// ─────────────────────────────────────────────────────────────────────────────
-// Water surface — multi-layer SVG waves
-// ─────────────────────────────────────────────────────────────────────────────
 function WaterSurface() {
   return (
     <div className={styles.surface}>
@@ -269,9 +246,6 @@ function WaterSurface() {
   );
 }
 
-// ─────────────────────────────────────────────────────────────────────────────
-// Sonar dive hint — a precise, elegant pulse ring at the waterline
-// ─────────────────────────────────────────────────────────────────────────────
 function SonarHint({ diving }) {
   return (
     <div className={`${styles.sonar} ${diving ? styles.sonarFade : ''}`}>
@@ -287,11 +261,8 @@ function SonarHint({ diving }) {
   );
 }
 
-// ─────────────────────────────────────────────────────────────────────────────
-// Main Landing component
-// ─────────────────────────────────────────────────────────────────────────────
 export default function Landing({ onDive }) {
-  const [diving, setDiving] = useState(false);
+  const [diving, setDiving]     = useState(false);
   const [revealed, setRevealed] = useState(false);
   const parallaxRef = useParallax();
   const sunRef      = useRef(null);
@@ -299,27 +270,22 @@ export default function Landing({ onDive }) {
   const contentRef  = useRef(null);
   const rafRef      = useRef(null);
 
-  // Staggered reveal on mount
   useEffect(() => {
     const t = setTimeout(() => setRevealed(true), 100);
     return () => clearTimeout(t);
   }, []);
 
-  // Parallax animation loop
   useEffect(() => {
     const tick = () => {
       const { x, y } = parallaxRef.current;
       if (sunRef.current) {
-        sunRef.current.style.transform =
-          `translate(calc(-50% + ${x * 14}px), calc(-50% + ${y * 8}px))`;
+        sunRef.current.style.transform = `translate(calc(-50% + ${x * 14}px), calc(-50% + ${y * 8}px))`;
       }
       if (haloRef.current) {
-        haloRef.current.style.transform =
-          `translate(calc(-50% + ${x * 20}px), calc(-50% + ${y * 12}px))`;
+        haloRef.current.style.transform = `translate(calc(-50% + ${x * 20}px), calc(-50% + ${y * 12}px))`;
       }
       if (contentRef.current) {
-        contentRef.current.style.transform =
-          `translate(calc(-50% + ${x * 6}px), calc(-64% + ${y * 4}px))`;
+        contentRef.current.style.transform = `translate(calc(-50% + ${x * 6}px), calc(-64% + ${y * 4}px))`;
       }
       rafRef.current = requestAnimationFrame(tick);
     };
@@ -327,10 +293,15 @@ export default function Landing({ onDive }) {
     return () => cancelAnimationFrame(rafRef.current);
   }, [parallaxRef]);
 
-  const handleDive = useCallback(() => {
+  const handleDive = useCallback((e) => {
     if (diving) return;
     setDiving(true);
-    setTimeout(onDive, 1100);
+    const origin = {
+      x: e.clientX / window.innerWidth,
+      y: e.clientY / window.innerHeight,
+    };
+    // short delay so flood overlay starts, then transition
+    setTimeout(() => onDive(origin), 80);
   }, [diving, onDive]);
 
   return (
@@ -338,30 +309,18 @@ export default function Landing({ onDive }) {
       className={`${styles.landing} ${diving ? styles.diving : ''}`}
       onClick={handleDive}
     >
-      {/* ── Sky ── */}
       <div className={styles.sky} />
-
-      {/* ── Stars with occasional shooting stars ── */}
       <StarCanvas diving={diving} />
-
-      {/* ── Atmospheric haze bands ── */}
       <div className={styles.hazeBand} style={{ '--hy': '18%', '--hopacity': '0.12' }} />
       <div className={styles.hazeBand} style={{ '--hy': '32%', '--hopacity': '0.08' }} />
-
-      {/* ── Sun atmosphere ── */}
       <div ref={haloRef} className={styles.sunHalo} />
       <div ref={sunRef}  className={styles.sun}>
         <div className={styles.sunCore} />
         <div className={styles.sunCorona} />
       </div>
-
-      {/* ── Light rays fanning down from sun ── */}
       <div className={styles.sunRays} />
 
-      {/* ── Hero text — splits in from below waterline ── */}
       <div ref={contentRef} className={`${styles.content} ${revealed ? styles.contentVisible : ''}`}>
-
-        {/* Eyebrow */}
         <p className={styles.eyebrow}>
           {'Portfolio'.split('').map((ch, i) => (
             <span key={i} className={styles.eyebrowChar} style={{ '--ci': i }}>
@@ -369,39 +328,25 @@ export default function Landing({ onDive }) {
             </span>
           ))}
         </p>
-
-        {/* Name — large serif, split lines */}
         <h1 className={styles.name}>
-          <span className={styles.nameLine} style={{ '--li': 0 }}>
-            Sahib
-          </span>
+          <span className={styles.nameLine} style={{ '--li': 0 }}>Sahib</span>
           <span className={`${styles.nameLine} ${styles.nameLineEm}`} style={{ '--li': 1 }}>
             <em>Singh</em>
           </span>
         </h1>
-
-        {/* Sub — roles with a divider */}
         <div className={styles.subRow} style={{ '--li': 2 }}>
           <span className={styles.subDash} />
           <p className={styles.sub}>Systems · Games · Worlds</p>
           <span className={styles.subDash} />
         </div>
-
       </div>
 
-      {/* ── Horizon shimmer ── */}
       <div className={styles.horizon} />
-
-      {/* ── Ripple canvas (water surface interaction) ── */}
       <RippleCanvas />
-
-      {/* ── Water ── */}
       <WaterSurface />
-
-      {/* ── Sonar dive hint ── */}
       <SonarHint diving={diving} />
 
-      {/* ── Flood overlay ── */}
+      {/* Flood — same gradient as PlungeOverlay for seamless handoff */}
       <div className={`${styles.flood} ${diving ? styles.flooding : ''}`} />
     </div>
   );

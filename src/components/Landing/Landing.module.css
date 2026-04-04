@@ -1,5 +1,5 @@
 /* ══════════════════════════════════════════════════════════════════════
-   LANDING — Cinematic deep-ocean dusk atmosphere
+   LANDING
    ══════════════════════════════════════════════════════════════════════ */
 
 .landing {
@@ -290,9 +290,7 @@
     rgba(94,207,223,0.18) 88%,
     transparent 100%
   );
-  box-shadow:
-    0 0 8px  rgba(94,207,223,0.28),
-    0 0 28px rgba(94,207,223,0.10);
+  box-shadow: 0 0 8px rgba(94,207,223,0.28), 0 0 28px rgba(94,207,223,0.10);
   animation: horizonPulse 4s ease-in-out infinite alternate;
 }
 @keyframes horizonPulse {
@@ -330,15 +328,11 @@
   to   { transform: translateX(-50%); }
 }
 
-/* ══════════════════════════════════════════════════════════════════════
-   SONAR DIVE HINT
-   Anchored to the horizon line (bottom: 43% + slight lift via transform)
-   ══════════════════════════════════════════════════════════════════════ */
+/* ── Sonar ───────────────────────────────────────────────────────────── */
 .sonar {
   position: absolute;
   bottom: 43%;
   left: 50%;
-  /* Center horizontally, lift the sonar dot to sit ON the horizon */
   transform: translate(-50%, 50%);
   z-index: 9;
   display: flex;
@@ -354,7 +348,6 @@
   opacity: 0 !important;
   transition: opacity 0.3s ease !important;
 }
-
 @keyframes sonarReveal {
   from { opacity: 0; transform: translate(-50%, 60%); }
   to   { opacity: 1; transform: translate(-50%, 50%); }
@@ -372,7 +365,6 @@
   align-items: center;
   justify-content: center;
 }
-
 .sonarRing {
   position: absolute;
   width:  var(--size);
@@ -386,17 +378,13 @@
   70%  { opacity: 0.20; }
   100% { transform: scale(1.5);  opacity: 0; }
 }
-
 .sonarDot {
   position: absolute;
   width: 7px;
   height: 7px;
   border-radius: 50%;
   background: #5ecfdf;
-  box-shadow:
-    0 0 10px rgba(94,207,223,0.95),
-    0 0 28px rgba(94,207,223,0.55),
-    0 0 50px rgba(94,207,223,0.20);
+  box-shadow: 0 0 10px rgba(94,207,223,0.95), 0 0 28px rgba(94,207,223,0.55), 0 0 50px rgba(94,207,223,0.20);
   animation: dotBreath 2s ease-in-out infinite;
   z-index: 1;
 }
@@ -404,7 +392,6 @@
   0%,100% { transform: scale(1.0); }
   50%      { transform: scale(1.6); }
 }
-
 .sonarText {
   font-family: var(--mono);
   font-size: 8px;
@@ -415,19 +402,30 @@
 }
 
 /* ── Flood overlay ───────────────────────────────────────────────────── */
+/* gradient MUST match PlungeOverlay.module.css .waterFill */
 .flood {
   position: absolute;
   inset: 0;
   z-index: 20;
-  background: linear-gradient(to top, #041425 0%, #082240 40%, #0d5a7a 75%, #12899e 100%);
+  background: linear-gradient(
+    to top,
+    #000508 0%,
+    #020d1c 18%,
+    #041425 35%,
+    #082240 55%,
+    #0a3a5c 72%,
+    #0d5a7a 88%,
+    #12899e 100%
+  );
   transform: translateY(100%);
   pointer-events: none;
+  opacity: 0;
 }
 .flooding {
-  animation: floodRise 1.05s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+  animation: floodRise 0.95s cubic-bezier(0.16, 1, 0.3, 1) forwards;
 }
 @keyframes floodRise {
-  0%   { transform: translateY(100%); opacity: 0.9; }
+  0%   { transform: translateY(100%); opacity: 0.95; }
   65%  { transform: translateY(0%);   opacity: 1; }
   100% { transform: translateY(0%);   opacity: 1; }
 }
